@@ -1,12 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User, AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import User, AbstractUser, BaseUserManager
 from django.urls import reverse
 
 
-class MyAccountManager(BaseUserManager):
-    def create_user()
+# class MyAccountManager(BaseUserManager):
+#     def create_user()
 
-class Teacher(AbstractBaseUser):
+class Teacher(AbstractUser):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     teaching_since = models.DateTimeField()
@@ -32,11 +32,11 @@ class Teacher(AbstractBaseUser):
         return self.first_name
 
     def get_absolute_url(self):
-        return reverse('index', kwargs={'pk': self.pk})
+        return reverse('index', kwargs={'username': self.username})
 
     ####def submittion_delete(self): # need to check how to to do it
 
-class Student(AbstractBaseUser):
+class Student(AbstractUser):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     student_since = models.DateTimeField()
@@ -52,7 +52,7 @@ class Student(AbstractBaseUser):
         return reverse('index', kwargs={'pk': self.pk})
 
 #need to run pip install django-phone-field
-class School(AbstractBaseUser):
+class School(models.Model):
     name_school = models.CharField(max_length=50)
     address = models.CharField(max_length=20)
     phone_number = PhoneField(blank=True, help_text='Contact phone number', unique=True)
@@ -61,8 +61,8 @@ class School(AbstractBaseUser):
     def __str__(self):
         return self.name_school
 
-    def get_absolute_url(self):
-        return reverse('index', kwargs={'pk': self.pk})
+    # def get_absolute_url(self):
+    #     return reverse('index', kwargs={'pk': self.pk})
 
 
 # def __str__(self):

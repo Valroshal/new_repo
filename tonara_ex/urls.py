@@ -25,14 +25,22 @@ router.register(r'users', UserViewSet)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
-urlpatterns = [
-    path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
-]
+# urlpatterns = [
+#     path('', include(router.urls)),
+#     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+# ]
 
 urlpatterns = [
-    path('polls/', include('polls.urls')),
-    path('polls/', include('django.contrib.auth.urls')), # new
+    path('admins/', include('admins.urls')),
+    path('admins/', include('django.contrib.auth.urls')), # new
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls'))
+    path('get_user_details', views.GetUserDetails)
+    path('_user', views.GetUserDetails)
+    path('doLogin', views.doLogin)
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+
+    #REST framework URLS
+    path('admins/students/', include('admins.urls', 'students_api'))
+    path('admins/teachers/', include('admins.urls', 'teachers_api'))
+    path('admins/admins/', include('admins.urls', 'admins_api'))
 ]
