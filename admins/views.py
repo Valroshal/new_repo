@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from admins.models import Admins, Teachers, Students, School
 from admins.serializers import StudentsSerializer, TeachersSerializer, AdminsSerializer, SchoolSerializer
 
-
+#class
 
 @api_view(['Get'])
 def students_detail_view(request, slug):
@@ -34,8 +34,8 @@ def update_students_view(request, slug):
 
     if request.method == "PUT":
 ############################### from here my code
-        if (request.user.role == "Admin" and request.user.school.name_school == students.user.school.name_school) or
-        (request.user.role == "Teacher" request.user.email == students.user.teacher.email)
+        # if (request.user.role == "Admin" and request.user.school.name_school == students.user.school.name_school) or
+        # (request.user.role == "Teacher" request.user.email == students.user.teacher.email)
 ############################################## end here permissions don't know if will work
             serializer = StudentsSerializer(students, data=request.data)
             data={}
@@ -45,9 +45,9 @@ def update_students_view(request, slug):
                 return Response(data=data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 ############################### from here my code 
-        else:
-            data["failure"] = "no permissions"
-            return Response(data=data)
+        # else:
+        #     data["failure"] = "no permissions"
+        #     return Response(data=data)
 ############################################## end here permissions don't know if will work
 
 
@@ -75,7 +75,7 @@ def create_students_view(request):
     account = request.user
     students = Students(school=account)
     
-    if request.method == "POST"
+    if request.method == "POST":
         serializer = StudentsSerializer(students, data=request.data)
         if serializer.is_valid():
             serializer.save()
