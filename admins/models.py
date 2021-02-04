@@ -18,7 +18,7 @@ class User_Roles(AbstractUser):
 class School(models.Model):
     name_school = models.CharField(max_length=50)
     address = models.CharField(max_length=20)
-    #phone_number = PhoneField(blank=True, help_text='Contact phone number', unique=True)
+    #phone_number = PhoneField(blank=True, help_text='Contact phone number', unique=True) #can be added intead
     phone_number = models.CharField(max_length=20)
     objects = models.Manager()
     created_at = models.DateField(auto_now_add=True)
@@ -81,8 +81,8 @@ class Students(models.Model):
 
 @receiver(post_save, sender=User_Roles)
 def create_user_profile(sender, instance, **kwargs):
-    #if created:
-        #Token.objects.create(user=instance) - can be token authentication instead
+
+        #Token.objects.create(user=instance) #- can be token authentication instead
         if instance.user_type==1:
             Admins.objects.create(admin=instance)
         if instance.user_type==2:
@@ -92,7 +92,7 @@ def create_user_profile(sender, instance, **kwargs):
 
 @receiver(post_save, sender=User_Roles)
 def save_user_profile(sender, instance, **kwargs):
-    #if created:
+
         if instance.user_type==1:
             instance.admins.save()
         if instance.user_type==2:
@@ -100,37 +100,3 @@ def save_user_profile(sender, instance, **kwargs):
         if instance.user_type==3:
             instance.students.save()
 
-
-
-    # def __str__(self):
-    #     if self.role.first_name and self.role.last_name:
-    #         full_name = self.role.first_name + " " + self.role.last_name
-    #     return full_name #relation with user_role
-
-
-# class TeacherProfile(models.Model):
-#     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
-#     teaching_since = models.DateTimeField()
-#     instrument = models.CharField(max_length=20)
-#     email = models.EmailField(max_length=254, unique=True)
-#     school = models.ForeignKey(School, on_delete=models.CASCADE)
-#     objects = models.Manager()
-#     created_at = models.DateField(auto_now=True, auto_now_add=True)
-#     updated_at = models.DateField(auto_now=True, auto_now_add=True)
-
-#     def __str__(self):
-#         return self.teacher.email
-
-# class StudentProfile(models.Model):
-#     student = models.ForeignKey(User, on_delete=models.CASCADE)
-#     student_since = models.DateTimeField()
-#     email = models.EmailField(max_length=254, unique=True)
-#     birthday = models.DateTimeField()
-#     school = models.ForeignKey(School, on_delete=models.CASCADE)    #?????????????????????????????????????????
-#     teacher = models.ForeignKey(Teachers, on_delete=models.CASCADE) #?????????????????????????????????????????????
-#     objects = models.Manager()
-#     created_at = models.DateField(auto_now=True, auto_now_add=True)
-#     updated_at = models.DateField(auto_now=True, auto_now_add=True)
-
-#     def __str__(self):
-#         return self.student.email
