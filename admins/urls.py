@@ -18,9 +18,9 @@ urlpatterns = [
     #path('<slug>/update', update_students_view, name="update_students"),
     path('students/delete', delete_students_view, name="delete_students"),
     #path('<slug>/delete', delete_students_view, name="delete_students"),
-    path('create', create_students_view, name="create_students"),
-    path('<slug>/', teachers_detail_view, name="teachers_detail"),
-    path('<slug>/', admins_detail_view, name="admins_detail"),
-    path('<slug>/', school_detail_view, name="school_detail"),
+    path('students/create', create_students_view, name="create_students"),
+    path('teachers/', teachers_detail_view, name="teachers_detail"),
+    path('admins/', admins_detail_view, name="admins_detail"),
+    path('school/', school_detail_view, name="school_detail"),
     
 ]

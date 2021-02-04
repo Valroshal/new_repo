@@ -19,6 +19,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'admins',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -26,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'phone_field',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -109,11 +111,16 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 AUTH_USER_MODEL = "admins.User_Roles"
-AUTHENTICATION_BACKENDS=['admins.emailBackEnd.EmailBackEnd']
+#AUTHENTICATION_BACKENDS=['admins.emailBackEnd.EmailBackEnd']
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+       'rest_framework.authentication.TokenAuthentication',
+       'rest_framework.authentication.SessionAuthentication',
+       'rest_framework.authentication.BasicAuthentication',
+   ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated'
     ]

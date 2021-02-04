@@ -1,42 +1,88 @@
 from django.shortcuts import render, redirect
-#from django.http import HttpResponse, HttpResponseRedirect
-#from django.contrib.auth import authenticate, login, logout
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-#from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.permissions import IsAuthenticated
 from admins.models import Admins, Teachers, Students, School
 from admins.serializers import StudentsSerializer, TeachersSerializer, AdminsSerializer, SchoolSerializer
 
-#class
 
 @api_view(['Get'])
-def students_detail_view(request, slug):
+#@permission_classes((IsAuthenticated)) - for token authentication
+def students_detail_view(request):
     try:
-        students = Students.objects.get(slug=slug)
-    except Students.DoesNotExist:
+        students = Students.objects.get()
+    except ObjectDoesNotExist:
+        print("doesn't exist")
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
         serializer = StudentsSerializer(students)
         return Response(serializer.data)
 
-
-
-######## try to give permissions#####################################################################################
-@api_view(['Put'])
-def update_students_view(request, slug):
+@api_view(['Get'])
+#@permission_classes((IsAuthenticated)) - for token authentication
+def teachers_detail_view(request):
     try:
-        students = Students.objects.get(slug=slug)
-    except Students.DoesNotExist:
+        teachers = Teachers.objects.get()
+    except ObjectDoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    if request.method == "GET":
+        serializer = TeachersSerializer(teachers)
+        return Response(serializer.data)
+
+
+@api_view(['Get'])
+#@permission_classes((IsAuthenticated)) - for token authentication
+def admins_detail_view(request):
+    try:
+        admins = Admins.objects.get()
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        serializer = AdminsSerializer(admins)
+        return Response(serializer.data)
+
+@api_view(['Get'])
+#@permission_classes((IsAuthenticated)) - for token authentication
+def school_detail_view(request):
+    try:
+        school = School.objects.get()
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        serializer = SchoolSerializer(school)
+        return Response(serializer.data)
+
+
+
+
+@api_view(['Put'])
+def update_students_view(request):
+    try:
+        students = Students.objects.get()
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+############################### permissions
+    user = request.user
+    if user.role == "Student":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.school != students.school:
+                return Response({'response': 'no permissions'})
+        else:
+            if user.role == "Teacher" and user.email != students.teacher.email:
+                return Response({'response': 'no permissions'})
+
+############################################## end here permissions 
     if request.method == "PUT":
-############################### from here my code
-        # if (request.user.role == "Admin" and request.user.school.name_school == students.user.school.name_school) or
-        # (request.user.role == "Teacher" request.user.email == students.user.teacher.email)
-############################################## end here permissions don't know if will work
+
             serializer = StudentsSerializer(students, data=request.data)
             data={}
             if serializer.is_valid():
@@ -44,23 +90,88 @@ def update_students_view(request, slug):
                 data["success"] = "update success"
                 return Response(data=data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-############################### from here my code 
-        # else:
-        #     data["failure"] = "no permissions"
-        #     return Response(data=data)
-############################################## end here permissions don't know if will work
+
+
+@api_view(['Put'])
+def update_teachers_view(request):
+    try:
+        teachers = Teachers.objects.get()
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+############################### permissions
+    user = request.user
+    if user.role == "Student" or user.role == "Teacher":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.school != teachers.school:
+                return Response({'response': 'no permissions'})
+
+############################################## end here permissions 
+    if request.method == "PUT":
+
+            serializer = TeachersSerializer(teachers, data=request.data)
+            data={}
+            if serializer.is_valid():
+                serializer.save()
+                data["success"] = "update success"
+                return Response(data=data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['Put'])
+def update_admins_view(request):
+    try:
+        admins = Admins.objects.get()
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+############################### permissions
+    user = request.user
+    if user.role == "Student" or user.role == "Teacher":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.id != admins.id:# id is automatic in django
+                return Response({'response': 'no permissions'})
+
+############################################## end here permissions 
+    if request.method == "PUT":
+
+            serializer = AdminsSerializer(admins, data=request.data)
+            data={}
+            if serializer.is_valid():
+                serializer.save()
+                data["success"] = "update success"
+                return Response(data=data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 
 
 
 @api_view(['Delete'])
-def delete_students_view(request, slug):
+def delete_students_view(request):
     try:
-        students = Students.objects.get(slug=slug)
-    except Students.DoesNotExist:
+        students = Students.objects.get()
+    except ObjectDoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+############################### permissions
+    user = request.user
+    if user.role == "Student":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.school != students.school:
+                return Response({'response': 'no permissions'})
+        else:
+            if user.role == "Teacher" and user.email != students.teacher.email:
+                return Response({'response': 'no permissions'})
+
+############################################## end here permissions 
     if request.method == "DELETE":
         operation= students.delete()
         data={}
@@ -70,16 +181,131 @@ def delete_students_view(request, slug):
             data["failure"] = "delete failed"
         return Response(data=data)
 
+@api_view(['Delete'])
+def delete_teachers_view(request):
+    try:
+        teachers = Teachers.objects.get()
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+############################### permissions
+    user = request.user
+    if user.role == "Student" or user.role == "Teacher":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.school != teachers.school:
+                return Response({'response': 'no permissions'})
+############################################## end here permissions 
+    if request.method == "DELETE":
+        operation= teachers.delete()
+        data={}
+        if operation:
+            data["success"] = "delete success"
+        else:
+            data["failure"] = "delete failed"
+        return Response(data=data)
+
+
+
+@api_view(['Delete'])
+def delete_admins_view(request):
+    try:
+        admins = Admins.objects.get()
+    except ObjectDoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+############################### permissions
+    user = request.user
+    if user.role == "Student" or user.role == "Teacher":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.id != admins.id: # id is automatic in django
+                return Response({'response': 'no permissions'})
+############################################## end here permissions 
+    if request.method == "DELETE":
+        operation= admins.delete()
+        data={}
+        if operation:
+            data["success"] = "delete success"
+        else:
+            data["failure"] = "delete failed"
+        return Response(data=data)
+
+
+
+
+
+
+
+
 @api_view(['Post'])
 def create_students_view(request):
-    account = request.user
-    students = Students(school=account)
+    user = request.user
+    students = Students.objects.create(user)
+    ############################### permissions
     
+    if user.role == "Student":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.school != students.school:
+                return Response({'response': 'no permissions'})
+        else:
+            if user.role == "Teacher" and user.email != students.teacher.email:
+                return Response({'response': 'no permissions'})
+
+############################################## end here permissions
     if request.method == "POST":
         serializer = StudentsSerializer(students, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer=dataת, status=status.HTTP_201_CREATED)
+            return Response(data=serializer, status=status.HTTP_201_CREATED) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['Post'])
+def create_teachers_view(request):
+    user = request.user
+    teachers = Teachers.objects.create(user)
+    ############################### permissions
+    user = request.user
+    if user.role == "Student" or user.role == "Teacher":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.school != teachers.school:
+                return Response({'response': 'no permissions'})
+############################################## end here permissions 
+
+    if request.method == "POST":
+        serializer = TeachersSerializer(teachers, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer, status=status.HTTP_201_CREATED) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['Post'])
+def create_admins_view(request):
+    user = request.user
+    admins = Admins.objects.create(user)
+    ############################### permissions
+    user = request.user
+    if user.role == "Student" or user.role == "Teacher":
+        return Response({'response': 'no permissions'})
+    else:
+        if user.role == "Admin":
+            if user.id != admins.id: # id is automatic in django
+                return Response({'response': 'no permissions'})
+############################################## end here permissions 
+
+    if request.method == "POST":
+        serializer = AdminsSerializer(admins, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer, status=status.HTTP_201_CREATED) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -87,40 +313,6 @@ def create_students_view(request):
 
 
 
-
-@api_view(['Get'])
-def teachers_detail_view(request, slug):
-    try:
-        teachers = Teachers.objects.get(slug=slug)
-    except Teachers.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = TeachersSerializer(teachers)
-        return Response(serializer.data)
-
-
-@api_view(['Get'])
-def admins_detail_view(request, slug):
-    try:
-        admins = Admins.objects.get(slug=slug)
-    except Admins.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = AdminsSerializer(admins)
-        return Response(serializer.data)
-
-@api_view(['Get'])
-def school_detail_view(request, slug):
-    try:
-        school = School.objects.get(slug=slug)
-    except School.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = SchoolSerializer(school)
-        return Response(serializer.data)
 
 
 

@@ -1,10 +1,10 @@
-from django.contrib import admin
+# from django.contrib import admin
 
-from django.contrib.auth.admin import UserAdmin
+# from django.contrib.auth.admin import UserAdmin
 
-from admins.models import User_Roles
+# from admins.models import User_Roles
 
-class UserModel(UserAdmin):
-    pass
+# class UserModel(UserAdmin):
+#     pass
 
-admin.site.register(User_Roles, UserModel)
+# admin.site.register(User_Roles, UserModel)
